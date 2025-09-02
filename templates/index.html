@@ -1,0 +1,156 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Database Manager{% endblock %}
+{% block subtitle %}Overview of your database{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h4>Database Overview</h4>
+    <div>
+        <a href="{{ url_for('view_tables') }}" class="btn btn-primary">
+            <i class="fas fa-table me-1"></i> Browse Tables
+        </a>
+        <a href="{{ url_for('sql_editor') }}" class="btn btn-outline-primary ms-2">
+            <i class="fas fa-code me-1"></i> SQL Editor
+        </a>
+    </div>
+</div>
+
+{% if connection_error %}
+    <div class="alert alert-danger animate-fadeIn">
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        Could not connect to the database. Please check your configuration.
+    </div>
+{% else %}
+    <!-- Stats Cards -->
+    <div class="row">
+        <div class="col-md-3">
+            <div class="card stat-card animate-fadeIn">
+                <i class="fas fa-database"></i>
+                <h2>{{ stats.table_count }}</h2>
+                <p>Tables</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card animate-fadeIn">
+                <i class="fas fa-list"></i>
+                <h2>{{ stats.total_rows }}</h2>
+                <p>Total Rows</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card animate-fadeIn">
+                <i class="fas fa-hdd"></i>
+                <h2>{{ stats.size }}</h2>
+                <p>Database Size</p>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card stat-card animate-fadeIn">
+                <i class="fas fa-plug"></i>
+                <h2>{{ stats.active_connections }}</h2>
+                <p>Active Connections</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Tables List -->
+        <div class="col-md-8">
+            <div class="card animate-fadeIn">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Database Tables</h5>
+                    <span class="badge bg-primary">{{ tables_data|length }} tables</span>
+                </div>
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Table Name</th>
+                                    <th>Rows</th>
+                                    <th>Size</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for table in tables_data %}
+                                    <tr>
+                                        <td>
+                                            <i class="fas fa-table me-2 text-info"></i>
+                                            {{ table.name }}
+                                        </td>
+                                        <td><span class="badge bg-secondary">{{ table.row_count }}</span></td>
+                                        <td><span class="badge bg-info">{{ table.size }}</span></td>
+                                        <td>
+                                            <div class="btn-group">
+                                                <a href="{{ url_for('view_table_data', table_name=table.name) }}" class="btn btn-sm btn-primary">
+                                                    <i class="fas fa-eye me-1"></i> View
+                                                </a>
+                                                <a href="{{ url_for('export_table', table_name=table.name) }}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-download me-1"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="col-md-4">
+            <div class="card animate-fadeIn">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-grid gap-2">
+                        <a href="{{ url_for('sql_editor') }}" class="btn btn-outline-primary text-start py-3">
+                            <i class="fas fa-code me-2"></i> SQL Query Editor
+                        </a>
+                        <a href="{{ url_for('view_tables') }}" class="btn btn-outline-primary text-start py-3">
+                            <i class="fas fa-list me-2"></i> Manage Tables
+                        </a>
+                        <a href="{{ url_for('delete_data') }}" class="btn btn-outline-danger text-start py-3">
+                            <i class="fas fa-trash me-2"></i> Data Management
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Database Info -->
+            <div class="card animate-fadeIn mt-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Database Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">Name:</span>
+                        <strong>{{ config.DB_NAME }}</strong>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">Host:</span>
+                        <strong>{{ config.DB_HOST }}:{{ config.DB_PORT }}</strong>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">User:</span>
+                        <strong>{{ config.DB_USER }}</strong>
+                    </div>
+                    <div class="mb-3 d-flex justify-content-between">
+                        <span class="text-muted">Size:</span>
+                        <strong>{{ stats.size }}</strong>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="text-muted">Tables:</span>
+                        <strong>{{ stats.table_count }}</strong>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

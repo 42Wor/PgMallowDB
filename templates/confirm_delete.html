@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+
+{% block title %}Confirm Deletion - Database Manager{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-danger text-white">
+                <h5 class="card-title mb-0"><i class="fas fa-exclamation-triangle me-2"></i>Confirm Deletion</h5>
+            </div>
+            <div class="card-body">
+                <div class="alert alert-danger">
+                    <h5 class="alert-heading">Warning!</h5>
+                    <p class="mb-0">
+                        You are about to delete all data from all tables in the database. This action cannot be undone.
+                    </p>
+                </div>
+
+                <p class="card-text">
+                    <strong>This will delete all data from all tables and reset any auto-increment counters.</strong>
+                </p>
+
+                <form method="POST" action="{{ url_for('delete_data') }}">
+                    <div class="form-check mb-3">
+                        <input class="form-check-input" type="checkbox" id="confirmCheck" required>
+                        <label class="form-check-label" for="confirmCheck">
+                            I understand that this action is irreversible and I have a backup if needed
+                        </label>
+                    </div>
+
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left me-1"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger">
+                            <i class="fas fa-trash me-1"></i> Delete All Data
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
