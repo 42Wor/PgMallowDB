@@ -13,28 +13,20 @@ app.secret_key = 'your-secret-key-here'  # Change this in production
 
 # Use the actual config if available
 try:
-    from config import DB_NAME, DB_USER, DB_PASSWORD, DB_HOST, DB_PORT
+    from config import DATABASE_URL
 except ImportError:
-    # Fallback to environment variables or hardcoded values
-    import os
-
-    DB_NAME = os.environ.get('DB_NAME', 'your_database_name')
-    DB_USER = os.environ.get('DB_USER', 'your_username')
-    DB_PASSWORD = os.environ.get('DB_PASSWORD', 'your_password')
-    DB_HOST = os.environ.get('DB_HOST', 'localhost')
-    DB_PORT = os.environ.get('DB_PORT', '5432')
-
+    # Fallback to environment variable
+    DATABASE_URL = os.environ.get('DATABASE_URL')
 
 def get_db_connection():
-    """Establishes and returns a database connection."""
+    """Establishes and returns a database connection using DATABASE_URL."""
+    if not DATABASE_URL:
+        flash("DATABASE_URL not configured", "error")
+        return None
+    
     try:
-        conn = psycopg2.connect(
-            dbname=DB_NAME,
-            user=DB_USER,
-            password=DB_PASSWORD,
-            host=DB_HOST,
-            port=DB_PORT
-        )
+        # psycopg2 can use DATABASE_URL directly
+        conn = psycopg2.connect(DATABASE_URL)
         return conn
     except psycopg2.OperationalError as e:
         flash(f"Database connection failed: {e}", "error")
